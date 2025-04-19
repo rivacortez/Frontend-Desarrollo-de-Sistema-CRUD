@@ -4,6 +4,7 @@ import { CustomerRepository } from '../../domain/repositories/CustomerRepository
 import type { Customer } from '../../domain/interfaces/Customer';
 
 const customerRepository = new CustomerRepository();
+const emit = defineEmits(['customer-created']);
 
 const showDialog = ref(false);
 const customer = ref<Customer>({
@@ -38,14 +39,15 @@ const resetForm = () => {
 
 const saveCustomer = async () => {
   if (saving.value) return;
-  
+
   error.value = '';
   success.value = '';
   saving.value = true;
-  
+
   try {
-    await customerRepository.create(customer.value);
+    const createdCustomer = await customerRepository.create(customer.value);
     success.value = 'Comensal creado correctamente';
+    emit('customer-created', createdCustomer);
     setTimeout(() => {
       showDialog.value = false;
       resetForm();
