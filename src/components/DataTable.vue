@@ -26,7 +26,7 @@ const props = withDefaults(defineProps<Props>(), {
   noDataText: 'No hay datos disponibles'
 });
 
-const emit = defineEmits(['edit', 'delete', 'view']);
+const emit = defineEmits(['edit', 'delete']);
 
 const search = ref('');
 const sortBy = ref('');
@@ -157,14 +157,7 @@ watch(filteredItems, () => {
               {{ formatValue(column, item) }}
             </td>
             <td class="actions-column">
-              <v-btn
-                icon="mdi-eye"
-                size="small"
-                variant="text"
-                color="info"
-                @click="emit('view', item)"
-                title="Ver detalles"
-              ></v-btn>
+
               <v-btn
                 icon="mdi-pencil"
                 size="small"

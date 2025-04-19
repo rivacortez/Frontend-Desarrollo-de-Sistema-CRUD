@@ -7,7 +7,8 @@ const props = defineProps({
   modelValue: Boolean,
   reservationId: {
     type: Number,
-    required: true
+    required: true,
+    default: 0
   }
 });
 
@@ -36,7 +37,7 @@ const peopleRules = [
 ];
 
 const loadReservation = async () => {
-  if (!props.reservationId) return;
+  if (!props.reservationId || props.reservationId === 0) return;
   loading.value = true;
   try {
     const data = await repository.getById(props.reservationId);
@@ -54,8 +55,11 @@ const saveChanges = async () => {
   error.value = '';
   success.value = '';
   saving.value = true;
-  
+
   try {
+    if (reservation.value.id === undefined) {
+      throw new Error('ID de reserva no válido');
+    }
     await repository.update(reservation.value.id, reservation.value);
     success.value = 'Reserva actualizada';
     emit('reservation-updated');

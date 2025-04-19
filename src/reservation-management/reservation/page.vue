@@ -1,3 +1,4 @@
+
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { ReservationRepository } from '../domain/repositories/ReservationRepository';
@@ -7,13 +8,12 @@ import EditReservationDialog from './dialogs/edit-reservation-dialog.vue';
 import DeleteReservationDialog from './dialogs/delete-reservation-dialog.vue';
 import DataTable from "../../components/DataTable.vue";
 
-
 const reservationRepository = new ReservationRepository();
 
 const reservations = ref<Reservation[]>([]);
 const loading = ref(true);
 const showDeleteDialog = ref(false);
-const reservationToDelete = ref<Reservation | null>(null);
+const reservationToDelete = ref<Reservation | undefined>(undefined);
 const error = ref('');
 const addDialog = ref<InstanceType<typeof AddReservationDialog> | null>(null);
 const editDialog = ref(false);
@@ -36,7 +36,7 @@ const columns = [
     sortable: true,
     formatter: (value: any) => value?.tableNumber || '-'
   }
-  ];
+];
 
 onMounted(() => {
   loadReservations();
@@ -60,25 +60,11 @@ const confirmDelete = (reservation: Reservation) => {
   showDeleteDialog.value = true;
 };
 
-const deleteReservation = async () => {
-  if (!reservationToDelete.value?.id) return;
-  loading.value = true;
-  try {
-    await reservationRepository.delete(reservationToDelete.value.id);
-    reservations.value = reservations.value.filter(r => r.id !== reservationToDelete.value?.id);
-  } catch (err) {
-    error.value = 'Error al eliminar reserva';
-    console.error(err);
-  } finally {
-    loading.value = false;
-    showDeleteDialog.value = false;
-    reservationToDelete.value = null;
-  }
-};
-
 const editReservation = (reservation: Reservation) => {
-  selectedReservationId.value = reservation.id;
-  editDialog.value = true;
+  if (reservation.id !== undefined) {
+    selectedReservationId.value = reservation.id;
+    editDialog.value = true;
+  }
 };
 
 const openAddDialog = () => {
@@ -93,6 +79,7 @@ const handleReservationDeleted = () => {
   loadReservations();
 };
 </script>
+
 
 <template>
   <div class="reservations-list">
