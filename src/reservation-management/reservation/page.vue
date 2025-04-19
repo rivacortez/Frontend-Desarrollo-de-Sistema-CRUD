@@ -35,9 +35,8 @@ const columns = [
     title: 'Mesa',
     sortable: true,
     formatter: (value: any) => value?.tableNumber || '-'
-  },
-  { key: 'actions', title: 'Acciones', sortable: false },
-];
+  }
+  ];
 
 onMounted(() => {
   loadReservations();
