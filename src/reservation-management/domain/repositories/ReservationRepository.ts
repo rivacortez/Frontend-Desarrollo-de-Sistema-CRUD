@@ -24,26 +24,7 @@ export class ReservationRepository {
     }
   }
 
-  async getById(id: number): Promise<Reservation | null> {
-    try {
-      if (!navigator.onLine) {
-        throw new Error("No internet connection available");
-      }
 
-      const response = await fetch(`${this.apiUrl}/${id}`);
-      if (!response.ok) {
-        if (response.status === 404) {
-          return null;
-        }
-        throw new Error(`Error fetching reservation: ${response.statusText}`);
-      }
-      const data = await response.json();
-      return this.mapToReservation(data);
-    } catch (error) {
-      console.error(`Error fetching reservation with id ${id}:`, error);
-      throw error;
-    }
-  }
 
   async create(reservation: Reservation): Promise<Reservation> {
     try {
