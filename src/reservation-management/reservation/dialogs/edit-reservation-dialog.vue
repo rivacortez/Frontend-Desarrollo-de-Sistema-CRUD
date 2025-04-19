@@ -152,7 +152,6 @@ const saveChanges = async () => {
       throw new Error('ID de reserva no válido');
     }
 
-    // Always use props.reservationId for the update operation
     await repository.update(props.reservationId, reservation.value);
     success.value = 'Reserva actualizada';
     emit('reservation-updated');

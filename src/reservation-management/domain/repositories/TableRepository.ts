@@ -29,8 +29,15 @@ export class TableRepository  {
         }
         throw new Error(`Error fetching table: ${response.statusText}`);
       }
-      const data = await response.json();
-      return this.mapToTable(data);
+
+      const responseData = await response.json();
+      const tableData = responseData.data || responseData;
+
+      if (!tableData) {
+        return null;
+      }
+
+      return this.mapToTable(tableData);
     } catch (error) {
       console.error(`Error fetching table with id ${id}:`, error);
       throw error;

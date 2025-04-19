@@ -11,11 +11,12 @@ const tableRepository = new TableRepository();
 const tables = ref<Table[]>([]);
 const loading = ref(true);
 const showDeleteDialog = ref(false);
+const showEditDialog = ref(false);
+const selectedTableId = ref<number>(0);
 const tableToDelete = ref<Table | null>(null);
 const error = ref('');
-const editDialog = ref(false);
-const selectedTableId = ref<number | undefined>(undefined);
-const addDialog = ref(false);
+const addTableDialog = ref();
+const refreshTrigger = ref(0);
 
 const columns = [
   { key: 'tableNumber', title: 'Número de Mesa', sortable: true },
@@ -23,57 +24,75 @@ const columns = [
   { key: 'location', title: 'Ubicación', sortable: true },
 ];
 
+
+const formattedTables = computed(() => {
+  return tables.value.map(table => ({
+    ...table,
+    capacity: table.capacity || 0
+  }));
+});
+
 async function loadTables() {
   loading.value = true;
   error.value = '';
 
   try {
-    tables.value = await tableRepository.getAll();
+    const result = await tableRepository.getAll();
+    tables.value = result;
+
+    if (tables.value.length === 0) {
+      error.value = 'No hay mesas registradas. Puede crear una nueva mesa usando el botón "Nueva Mesa".';
+    }
   } catch (err) {
     error.value = 'Error al cargar las mesas. Por favor, inténtelo de nuevo.';
-    console.error(err);
+    console.error('Error loading tables:', err);
   } finally {
     loading.value = false;
   }
 }
 
 function confirmDelete(table: Table) {
+  if (!table || table.id === undefined) {
+    error.value = 'Error: No se puede eliminar una mesa sin ID válido';
+    return;
+  }
+
   tableToDelete.value = table;
   showDeleteDialog.value = true;
 }
 
 function editTable(table: Table) {
-  if (table.id !== undefined) {
-    selectedTableId.value = table.id;
-    editDialog.value = true;
-  } else {
+  if (!table || table.id === undefined) {
     error.value = 'Error: La mesa seleccionada no tiene un ID válido';
+    return;
   }
+
+  selectedTableId.value = table.id;
+  showEditDialog.value = true;
 }
 
 function createTable() {
-  addDialog.value = true;
+  if (addTableDialog.value) {
+    addTableDialog.value.openDialog();
+  }
+}
+
+function refreshData() {
+  refreshTrigger.value++;
+  loadTables();
 }
 
 function handleTableUpdated() {
-  loadTables();
+  refreshData();
 }
 
 function handleTableDeleted() {
-  loadTables();
+  refreshData();
 }
 
 function handleTableCreated() {
-  loadTables();
+  refreshData();
 }
-
-const safeTableToDelete = computed(() => {
-  return tableToDelete.value || {
-    tableNumber: '',
-    capacity: 0,
-    location: ''
-  };
-});
 
 onMounted(() => {
   loadTables();
@@ -98,7 +117,7 @@ onMounted(() => {
 
           <v-alert
               v-if="error"
-              type="error"
+              :type="tables.length === 0 ? 'info' : 'error'"
               variant="tonal"
               closable
               class="mb-4"
@@ -109,7 +128,7 @@ onMounted(() => {
           <v-card>
             <v-card-text>
               <DataTable
-                  :items="tables"
+                  :items="formattedTables"
                   :columns="columns"
                   :loading="loading"
                   search-placeholder="Buscar mesas..."
@@ -125,26 +144,20 @@ onMounted(() => {
     <!-- Dialogs -->
     <DeleteTableDialog
         v-model="showDeleteDialog"
-        :table="safeTableToDelete"
+        :table="tableToDelete || {tableNumber: '', capacity: 0, location: ''}"
         @table-deleted="handleTableDeleted"
     />
 
     <EditTableDialog
-        v-model="editDialog"
-        :table-id="selectedTableId || 0"
+        v-model="showEditDialog"
+        :tableId="selectedTableId"
+        @update:modelValue="showEditDialog = $event"
         @table-updated="handleTableUpdated"
     />
 
     <AddTableDialog
         ref="addTableDialog"
-        v-model="addDialog"
         @table-created="handleTableCreated"
     />
   </div>
 </template>
-
-<style scoped>
-.tables-list {
-  padding: 16px 0;
-}
-</style>
