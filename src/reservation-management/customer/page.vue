@@ -22,7 +22,6 @@ const columns = [
   { key: 'email', title: 'Correo', sortable: true },
   { key: 'phone', title: 'Teléfono', sortable: true },
   { key: 'address', title: 'Dirección', sortable: true },
-  { key: 'actions', title: 'Acciones', sortable: false }
 ];
 
 onMounted(loadCustomerList);
