@@ -1,9 +1,21 @@
 import type { Reservation } from "../interfaces/Reservation";
 import { API_ENDPOINTS } from "../../../config/api.ts";
 
+/**
+ * `ReservationRepository` is a repository class responsible for managing CRUD operations
+ * for the `Reservation` entity. It interacts with a REST API to perform these operations.
+ */
 export class ReservationRepository {
+  /**
+   * Base URL for the reservation-related API endpoints.
+   */
   private apiUrl = API_ENDPOINTS.RESERVATIONS;
 
+  /**
+   * Fetches all reservations from the API.
+   * @returns {Promise<Reservation[]>} A promise that resolves to an array of `Reservation` objects.
+   * @throws Will throw an error if the API request fails or if there is no internet connection.
+   */
   async getAll(): Promise<Reservation[]> {
     try {
       if (!navigator.onLine) {
@@ -24,8 +36,12 @@ export class ReservationRepository {
     }
   }
 
-
-
+  /**
+   * Creates a new reservation in the API.
+   * @param {Reservation} reservation - The reservation data to create.
+   * @returns {Promise<Reservation>} A promise that resolves to the created `Reservation` object.
+   * @throws Will throw an error if the API request fails or if there is no internet connection.
+   */
   async create(reservation: Reservation): Promise<Reservation> {
     try {
       if (!navigator.onLine) {
@@ -60,6 +76,13 @@ export class ReservationRepository {
     }
   }
 
+  /**
+   * Updates an existing reservation in the API.
+   * @param {number} id - The ID of the reservation to update.
+   * @param {Reservation} reservation - The updated reservation data.
+   * @returns {Promise<Reservation>} A promise that resolves to the updated `Reservation` object.
+   * @throws Will throw an error if the API request fails or if there is no internet connection.
+   */
   async update(id: number, reservation: Reservation): Promise<Reservation> {
     try {
       if (!navigator.onLine) {
@@ -88,6 +111,12 @@ export class ReservationRepository {
     }
   }
 
+  /**
+   * Deletes a reservation from the API.
+   * @param {number} id - The ID of the reservation to delete.
+   * @returns {Promise<void>} A promise that resolves when the reservation is deleted.
+   * @throws Will throw an error if the API request fails or if there is no internet connection.
+   */
   async delete(id: number): Promise<void> {
     try {
       if (!navigator.onLine) {
@@ -108,6 +137,11 @@ export class ReservationRepository {
     }
   }
 
+  /**
+   * Maps raw API data to a `Reservation` object.
+   * @param {any} data - The raw data from the API.
+   * @returns {Reservation} A `Reservation` object.
+   */
   private mapToReservation(data: any): Reservation {
     if (!data) return null as unknown as Reservation;
 
@@ -142,6 +176,11 @@ export class ReservationRepository {
     };
   }
 
+  /**
+   * Maps a `Reservation` object to the DTO format expected by the API.
+   * @param {Reservation} reservation - The `Reservation` object to map.
+   * @returns {any} The DTO representation of the `Reservation`.
+   */
   private mapToDto(reservation: Reservation): any {
     let formattedTime = reservation.time;
     if (formattedTime && !formattedTime.includes(':')) {

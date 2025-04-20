@@ -1,10 +1,22 @@
 import type { Table } from "../interfaces/Table";
 import { API_ENDPOINTS } from "../../../config/api.ts";
 
-export class TableRepository  {
-  
+/**
+ * `TableRepository` is a repository class responsible for managing CRUD operations
+ * for the `Table` entity. It interacts with a REST API to perform these operations.
+ */
+export class TableRepository {
+
+  /**
+   * Base URL for the table-related API endpoints.
+   */
   private apiUrl = API_ENDPOINTS.TABLES;
 
+  /**
+   * Fetches all tables from the API.
+   * @returns {Promise<Table[]>} A promise that resolves to an array of `Table` objects.
+   * @throws Will throw an error if the API request fails.
+   */
   async getAll(): Promise<Table[]> {
     try {
       const response = await fetch(this.apiUrl);
@@ -20,6 +32,12 @@ export class TableRepository  {
     }
   }
 
+  /**
+   * Fetches a single table by its ID.
+   * @param {number} id - The ID of the table to fetch.
+   * @returns {Promise<Table | null>} A promise that resolves to a `Table` object or `null` if not found.
+   * @throws Will throw an error if the API request fails for reasons other than a 404.
+   */
   async getById(id: number): Promise<Table | null> {
     try {
       const response = await fetch(`${this.apiUrl}/${id}`);
@@ -44,6 +62,12 @@ export class TableRepository  {
     }
   }
 
+  /**
+   * Creates a new table in the API.
+   * @param {Table} table - The table data to create.
+   * @returns {Promise<Table>} A promise that resolves to the created `Table` object.
+   * @throws Will throw an error if the API request fails.
+   */
   async create(table: Table): Promise<Table> {
     try {
       const response = await fetch(this.apiUrl, {
@@ -53,11 +77,11 @@ export class TableRepository  {
         },
         body: JSON.stringify(this.mapToDto(table)),
       });
-      
+
       if (!response.ok) {
         throw new Error(`Error creating table: ${response.statusText}`);
       }
-      
+
       const data = await response.json();
       return this.mapToTable(data);
     } catch (error) {
@@ -66,6 +90,13 @@ export class TableRepository  {
     }
   }
 
+  /**
+   * Updates an existing table in the API.
+   * @param {number} id - The ID of the table to update.
+   * @param {Table} table - The updated table data.
+   * @returns {Promise<Table>} A promise that resolves to the updated `Table` object.
+   * @throws Will throw an error if the API request fails.
+   */
   async update(id: number, table: Table): Promise<Table> {
     try {
       const response = await fetch(`${this.apiUrl}/${id}`, {
@@ -75,11 +106,11 @@ export class TableRepository  {
         },
         body: JSON.stringify(this.mapToDto(table)),
       });
-      
+
       if (!response.ok) {
         throw new Error(`Error updating table: ${response.statusText}`);
       }
-      
+
       const data = await response.json();
       return this.mapToTable(data);
     } catch (error) {
@@ -88,12 +119,18 @@ export class TableRepository  {
     }
   }
 
+  /**
+   * Deletes a table from the API.
+   * @param {number} id - The ID of the table to delete.
+   * @returns {Promise<void>} A promise that resolves when the table is deleted.
+   * @throws Will throw an error if the API request fails.
+   */
   async delete(id: number): Promise<void> {
     try {
       const response = await fetch(`${this.apiUrl}/${id}`, {
         method: 'DELETE',
       });
-      
+
       if (!response.ok) {
         throw new Error(`Error deleting table: ${response.statusText}`);
       }
@@ -103,21 +140,31 @@ export class TableRepository  {
     }
   }
 
+  /**
+   * Maps raw API data to a `Table` object.
+   * @param {any} data - The raw data from the API.
+   * @returns {Table} A `Table` object.
+   */
   private mapToTable(data: any): Table {
     return {
       id: data.id,
-      tableNumber: data.numero_mesa,  
-      capacity: data.capacidad,     
-      location: data.ubicacion || '', 
+      tableNumber: data.numero_mesa,
+      capacity: data.capacidad,
+      location: data.ubicacion || '',
     };
   }
 
+  /**
+   * Maps a `Table` object to the DTO format expected by the API.
+   * @param {Table} table - The `Table` object to map.
+   * @returns {any} The DTO representation of the `Table`.
+   */
   private mapToDto(table: Table): any {
     return {
       id: table.id,
-      numero_mesa: table.tableNumber,  
-      capacidad: table.capacity,       
-      ubicacion: table.location,      
+      numero_mesa: table.tableNumber,
+      capacidad: table.capacity,
+      ubicacion: table.location,
     };
   }
 }

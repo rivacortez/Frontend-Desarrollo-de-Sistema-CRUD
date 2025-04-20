@@ -1,10 +1,22 @@
 import type { Customer } from '../interfaces/Customer';
 import { API_ENDPOINTS } from "../../../config/api.ts";
 
+/**
+ * `CustomerRepository` is a repository class responsible for managing CRUD operations
+ * for the `Customer` entity. It interacts with a REST API to perform these operations.
+ */
 export class CustomerRepository {
 
+  /**
+   * Base URL for the customer-related API endpoints.
+   */
   private apiUrl = API_ENDPOINTS.CUSTOMERS;
 
+  /**
+   * Fetches all customers from the API.
+   * @returns {Promise<Customer[]>} A promise that resolves to an array of `Customer` objects.
+   * @throws Will throw an error if the API request fails.
+   */
   async getAll(): Promise<Customer[]> {
     try {
       const response = await fetch(this.apiUrl);
@@ -20,6 +32,12 @@ export class CustomerRepository {
     }
   }
 
+  /**
+   * Fetches a single customer by their ID.
+   * @param {number} id - The ID of the customer to fetch.
+   * @returns {Promise<Customer | null>} A promise that resolves to a `Customer` object or `null` if not found.
+   * @throws Will throw an error if the API request fails for reasons other than a 404.
+   */
   async getById(id: number): Promise<Customer | null> {
     try {
       const response = await fetch(`${this.apiUrl}/${id}`);
@@ -37,6 +55,12 @@ export class CustomerRepository {
     }
   }
 
+  /**
+   * Creates a new customer in the API.
+   * @param {Customer} customer - The customer data to create.
+   * @returns {Promise<Customer>} A promise that resolves to the created `Customer` object.
+   * @throws Will throw an error if the API request fails.
+   */
   async create(customer: Customer): Promise<Customer> {
     try {
       const response = await fetch(this.apiUrl, {
@@ -59,6 +83,13 @@ export class CustomerRepository {
     }
   }
 
+  /**
+   * Updates an existing customer in the API.
+   * @param {number} id - The ID of the customer to update.
+   * @param {Customer} customer - The updated customer data.
+   * @returns {Promise<Customer>} A promise that resolves to the updated `Customer` object.
+   * @throws Will throw an error if the API request fails.
+   */
   async update(id: number, customer: Customer): Promise<Customer> {
     try {
       const response = await fetch(`${this.apiUrl}/${id}`, {
@@ -81,6 +112,12 @@ export class CustomerRepository {
     }
   }
 
+  /**
+   * Deletes a customer from the API.
+   * @param {number} id - The ID of the customer to delete.
+   * @returns {Promise<void>} A promise that resolves when the customer is deleted.
+   * @throws Will throw an error if the API request fails.
+   */
   async delete(id: number): Promise<void> {
     try {
       const response = await fetch(`${this.apiUrl}/${id}`, {
@@ -96,6 +133,11 @@ export class CustomerRepository {
     }
   }
 
+  /**
+   * Maps raw API data to a `Customer` object.
+   * @param {any} data - The raw data from the API.
+   * @returns {Customer} A `Customer` object.
+   */
   private mapToCustomer(data: any): Customer {
     return {
       id: data.id,
@@ -108,6 +150,11 @@ export class CustomerRepository {
     };
   }
 
+  /**
+   * Maps a `Customer` object to the DTO format expected by the API.
+   * @param {Customer} customer - The `Customer` object to map.
+   * @returns {any} The DTO representation of the `Customer`.
+   */
   private mapToDto(customer: Customer): any {
     return {
       id: customer.id,
