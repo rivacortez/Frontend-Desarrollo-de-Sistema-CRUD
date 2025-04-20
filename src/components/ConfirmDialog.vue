@@ -35,39 +35,36 @@ function cancel() {
 
 <template>
   <v-dialog
-    :model-value="modelValue"
-    @update:model-value="emit('update:modelValue', $event)"
-    :width="width"
-    :persistent="persistent"
+      :model-value="props.modelValue"
+      @update:model-value="emit('update:modelValue', $event)"
+      :width="props.width"
+      :persistent="props.persistent"
   >
     <v-card>
       <v-card-title class="text-h5 pa-4">
-        {{ title }}
+        {{ props.title }}
       </v-card-title>
-      
+
       <v-card-text class="pa-4 pt-2">
-        {{ message }}
+        {{ props.message }}
       </v-card-text>
-      
+
       <v-card-actions class="pa-4 pt-0">
         <v-spacer></v-spacer>
         <v-btn
-          variant="text"
-          @click="cancel"
+            variant="text"
+            @click="cancel"
         >
-          {{ cancelText }}
+          {{ props.cancelText }}
         </v-btn>
         <v-btn
-          :color="confirmColor"
-          variant="elevated"
-          @click="confirm"
+            :color="props.confirmColor"
+            variant="elevated"
+            @click="confirm"
         >
-          {{ confirmText }}
+          {{ props.confirmText }}
         </v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
 </template>
-
-<style scoped>
-</style>

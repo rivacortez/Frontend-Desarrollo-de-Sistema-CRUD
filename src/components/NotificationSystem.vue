@@ -2,11 +2,12 @@
 import { useNotificationStore } from '../stores/notification';
 import { storeToRefs } from 'pinia';
 import { computed } from 'vue';
+import type { CSSProperties } from 'vue';
 
 const store = useNotificationStore();
 const { notifications } = storeToRefs(store);
 
-const positionStyle = computed(() => ({
+const positionStyle = computed<CSSProperties>(() => ({
   position: 'fixed',
   top: '20px',
   right: '20px',

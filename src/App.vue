@@ -4,7 +4,6 @@ import { useRouter, useRoute } from 'vue-router';
 import { useTheme, useDisplay } from 'vuetify';
 import NotificationSystem from './components/NotificationSystem.vue';
 
-const router = useRouter();
 const route = useRoute();
 const theme = useTheme();
 const { mdAndUp } = useDisplay();

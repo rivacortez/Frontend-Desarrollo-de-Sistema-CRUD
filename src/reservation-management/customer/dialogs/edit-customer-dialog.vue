@@ -23,8 +23,7 @@ const customer = ref<Customer>({
   address: ''
 });
 const saving = ref(false);
-const error = ref('');
-const success = ref('');
+
 
 const nameRules = [
   (v: string) => !!v || 'El nombre es obligatorio',
