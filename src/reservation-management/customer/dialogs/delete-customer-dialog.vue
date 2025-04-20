@@ -2,6 +2,7 @@
 import { ref, watch } from 'vue';
 import { CustomerRepository } from '../../domain/repositories/CustomerRepository';
 import type { Customer } from '../../domain/interfaces/Customer';
+import { useNotificationStore } from '../../../stores/notification';
 
 const props = defineProps({
   modelValue: Boolean,
@@ -13,14 +14,11 @@ const props = defineProps({
 
 const emit = defineEmits(['update:modelValue', 'customer-deleted']);
 const repository = new CustomerRepository();
+const notificationStore = useNotificationStore();
 
 const loading = ref(false);
-const error = ref('');
-const success = ref('');
 
 const resetState = () => {
-  error.value = '';
-  success.value = '';
   loading.value = false;
 };
 
@@ -29,26 +27,26 @@ const handleConfirm = async () => {
   loading.value = true;
 
   if (!props.customer) {
-    error.value = 'Cliente no válido';
+    notificationStore.error('Cliente no válido');
     loading.value = false;
     return;
   }
 
   if (props.customer.id === undefined) {
-    error.value = 'ID de cliente no válido';
+    notificationStore.error('ID de cliente no válido');
     loading.value = false;
     return;
   }
 
   try {
     await repository.delete(props.customer.id);
-    success.value = 'Cliente eliminado';
+    notificationStore.success('Cliente eliminado');
     setTimeout(() => {
       emit('customer-deleted');
       emit('update:modelValue', false);
     }, 1000);
   } catch (err) {
-    error.value = 'Error al eliminar cliente';
+    notificationStore.error('Error al eliminar cliente');
     console.error(err);
   } finally {
     loading.value = false;
@@ -73,26 +71,6 @@ watch(() => props.modelValue, (newVal) => {
       </v-card-title>
 
       <v-card-text class="mt-4">
-        <v-alert
-            v-if="error"
-            type="error"
-            variant="tonal"
-            closable
-            class="mb-4"
-        >
-          {{ error }}
-        </v-alert>
-
-        <v-alert
-            v-if="success"
-            type="success"
-            variant="tonal"
-            closable
-            class="mb-4"
-        >
-          {{ success }}
-        </v-alert>
-
         <p class="text-body-1" v-if="customer">
           ¿Está seguro de eliminar al cliente
           <strong>{{ customer.name }}</strong>?

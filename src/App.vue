@@ -2,6 +2,7 @@
 import { ref, computed, onMounted, watch } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { useTheme, useDisplay } from 'vuetify';
+import NotificationSystem from './components/NotificationSystem.vue';
 
 const router = useRouter();
 const route = useRoute();
@@ -98,7 +99,7 @@ const onNavClick = () => {
             <v-list-item-icon>
               <v-icon small :color="item.color">mdi-circle-small</v-icon>
             </v-list-item-icon>
-          </template>
+</template>
         </v-list-item>
       </v-list>
 
@@ -143,7 +144,7 @@ const onNavClick = () => {
           <v-avatar v-bind="props" size="40" class="cursor-pointer">
             <v-img :src="user.avatar"/>
           </v-avatar>
-        </template>
+</template>
         <v-list dense>
           <v-list-item link prepend-icon="mdi-account-circle">
             <v-list-item-title>Perfil</v-list-item-title>
@@ -169,6 +170,7 @@ const onNavClick = () => {
         </router-view>
       </v-container>
     </v-main>
+    <NotificationSystem />
   </v-app>
 </template>
 

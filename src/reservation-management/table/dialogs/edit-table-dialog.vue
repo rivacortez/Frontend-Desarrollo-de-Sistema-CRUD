@@ -2,8 +2,10 @@
 import { ref, watch } from 'vue';
 import { TableRepository } from '../../domain/repositories/TableRepository';
 import type { Table } from '../../domain/interfaces/Table';
+import { useNotificationStore } from '../../../stores/notification';
 
 const repository = new TableRepository();
+const notificationStore = useNotificationStore();
 
 const props = defineProps({
   modelValue: Boolean,
@@ -43,18 +45,15 @@ const resetForm = () => {
     capacity: 0,
     location: ''
   };
-  error.value = '';
-  success.value = '';
 };
 
 const loadTable = async () => {
   if (!props.tableId) {
-    error.value = 'ID de mesa no válido';
+    notificationStore.error('ID de mesa no válido');
     return;
   }
 
   loading.value = true;
-  error.value = '';
 
   try {
     const tableData = await repository.getById(props.tableId);
@@ -67,11 +66,11 @@ const loadTable = async () => {
         location: tableData.location || ''
       };
     } else {
-      error.value = 'No se encontró la mesa';
+      notificationStore.error('No se encontró la mesa');
     }
   } catch (err) {
     console.error('Error loading table:', err);
-    error.value = 'Error al cargar mesa. Por favor, inténtelo de nuevo.';
+    notificationStore.error('Error al cargar mesa. Por favor, inténtelo de nuevo.');
   } finally {
     loading.value = false;
   }
@@ -80,8 +79,6 @@ const loadTable = async () => {
 const saveChanges = async () => {
   if (saving.value) return;
 
-  error.value = '';
-  success.value = '';
   saving.value = true;
 
   try {
@@ -98,7 +95,7 @@ const saveChanges = async () => {
     }
 
     await repository.update(props.tableId, table.value);
-    success.value = 'Mesa actualizada correctamente';
+    notificationStore.success('Mesa actualizada');
     emit('table-updated');
 
     setTimeout(() => {
@@ -106,11 +103,7 @@ const saveChanges = async () => {
     }, 1000);
   } catch (err) {
     console.error('Error saving table:', err);
-    if (err instanceof Error) {
-      error.value = err.message;
-    } else {
-      error.value = 'Error al actualizar mesa';
-    }
+    notificationStore.error(err instanceof Error ? err.message : 'Error al actualizar mesa');
   } finally {
     saving.value = false;
   }
@@ -153,26 +146,6 @@ watch(() => props.tableId, async (newVal, oldVal) => {
       </v-card-title>
 
       <v-card-text class="mt-4">
-        <v-alert
-            v-if="error"
-            type="error"
-            variant="tonal"
-            closable
-            class="mb-4"
-        >
-          {{ error }}
-        </v-alert>
-
-        <v-alert
-            v-if="success"
-            type="success"
-            variant="tonal"
-            closable
-            class="mb-4"
-        >
-          {{ success }}
-        </v-alert>
-
         <v-progress-circular
             v-if="loading"
             indeterminate

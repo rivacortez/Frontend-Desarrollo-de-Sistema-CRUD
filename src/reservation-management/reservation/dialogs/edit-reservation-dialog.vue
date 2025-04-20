@@ -6,6 +6,7 @@ import { TableRepository } from '../../domain/repositories/TableRepository';
 import type { Reservation } from '../../domain/interfaces/Reservation';
 import type { Customer } from '../../domain/interfaces/Customer';
 import type { Table } from '../../domain/interfaces/Table';
+import { useNotificationStore } from '../../../stores/notification';
 
 const props = defineProps({
   modelValue: Boolean,
@@ -20,6 +21,7 @@ const emit = defineEmits(['update:modelValue', 'reservation-updated']);
 const repository = new ReservationRepository();
 const customerRepository = new CustomerRepository();
 const tableRepository = new TableRepository();
+const notificationStore = useNotificationStore();
 
 const showDialog = ref(false);
 const reservation = ref<Reservation>({
@@ -32,8 +34,6 @@ const reservation = ref<Reservation>({
 });
 const loading = ref(false);
 const saving = ref(false);
-const error = ref('');
-const success = ref('');
 const customers = ref<Customer[]>([]);
 const tables = ref<Table[]>([]);
 const selectedCustomer = ref<Customer | null>(null);
@@ -58,7 +58,7 @@ const loadReferenceData = async () => {
     return true;
   } catch (err) {
     console.error('Error loading reference data:', err);
-    error.value = 'Error al cargar datos de clientes y mesas';
+    notificationStore.error('Error al cargar datos de clientes y mesas');
     return false;
   }
 };
@@ -78,8 +78,6 @@ const resetForm = () => {
   };
   selectedCustomer.value = null;
   selectedTable.value = null;
-  error.value = '';
-  success.value = '';
 };
 
 const loadReservation = async () => {
@@ -88,7 +86,6 @@ const loadReservation = async () => {
   }
 
   loading.value = true;
-  error.value = '';
 
   try {
     if (customers.value.length === 0 || tables.value.length === 0) {
@@ -119,11 +116,12 @@ const loadReservation = async () => {
       selectedCustomer.value = customers.value.find(c => c.id === reservation.value.customerId) || null;
       selectedTable.value = tables.value.find(t => t.id === reservation.value.tableId) || null;
     } else {
-      error.value = 'No se encontró la reserva';
+      notificationStore.error('No se encontró la reserva');
     }
   } catch (err) {
     console.error('Error loading reservation:', err);
-    error.value = 'Error al cargar reserva';
+    notificationStore.error('Error al cargar la reserva');
+    console.error(err);
   } finally {
     loading.value = false;
   }
@@ -143,8 +141,6 @@ const updateTableId = () => {
 
 const saveChanges = async () => {
   if (saving.value) return;
-  error.value = '';
-  success.value = '';
   saving.value = true;
 
   try {
@@ -153,14 +149,15 @@ const saveChanges = async () => {
     }
 
     await repository.update(props.reservationId, reservation.value);
-    success.value = 'Reserva actualizada';
+    notificationStore.success('Reserva actualizada');
     emit('reservation-updated');
 
     setTimeout(() => {
       emit('update:modelValue', false);
-    }, 1000);
+    }, 1500);
   } catch (err) {
-    error.value = 'Error al actualizar reserva';
+    notificationStore.error('Error al actualizar reserva');
+    console.error(err);
   } finally {
     saving.value = false;
   }
@@ -201,25 +198,6 @@ watch(() => props.reservationId, (newVal, oldVal) => {
       </v-card-title>
 
       <v-card-text class="mt-4">
-        <v-alert
-            v-if="error"
-            type="error"
-            variant="tonal"
-            closable
-            class="mb-4"
-        >
-          {{ error }}
-        </v-alert>
-
-        <v-alert
-            v-if="success"
-            type="success"
-            variant="tonal"
-            closable
-            class="mb-4"
-        >
-          {{ success }}
-        </v-alert>
 
         <v-progress-circular
             v-if="loading"

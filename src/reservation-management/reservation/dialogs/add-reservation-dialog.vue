@@ -6,11 +6,13 @@ import { TableRepository } from '../../domain/repositories/TableRepository';
 import type { Reservation } from '../../domain/interfaces/Reservation';
 import type { Customer } from '../../domain/interfaces/Customer';
 import type { Table } from '../../domain/interfaces/Table';
+import { useNotificationStore } from '../../../stores/notification';
 
 const emit = defineEmits(['reservation-created']);
 const reservationRepository = new ReservationRepository();
 const customerRepository = new CustomerRepository();
 const tableRepository = new TableRepository();
+const notificationStore = useNotificationStore();
 
 const showDialog = ref(false);
 const reservation = ref<Reservation>({
@@ -21,8 +23,6 @@ const reservation = ref<Reservation>({
   tableId: 0
 });
 const saving = ref(false);
-const error = ref('');
-const success = ref('');
 const customers = ref<Customer[]>([]);
 const tables = ref<Table[]>([]);
 const selectedCustomer = ref<Customer | null>(null);
@@ -42,7 +42,7 @@ onMounted(async () => {
     tables.value = await tableRepository.getAll();
   } catch (err) {
     console.error('Error al cargar datos:', err);
-    error.value = 'Error al cargar clientes y mesas';
+    notificationStore.error('Error al cargar clientes y mesas');
   }
 });
 
@@ -56,8 +56,7 @@ const resetForm = () => {
   };
   selectedCustomer.value = null;
   selectedTable.value = null;
-  error.value = '';
-  success.value = '';
+
 };
 
 const updateCustomerId = () => {
@@ -75,20 +74,19 @@ const updateTableId = () => {
 const saveReservation = async () => {
   if (saving.value) return;
   
-  error.value = '';
-  success.value = '';
+
   saving.value = true;
   
   try {
     await reservationRepository.create(reservation.value);
-    success.value = 'Reserva creada';
+    notificationStore.success('Reserva creada');
     emit('reservation-created');
     setTimeout(() => {
       showDialog.value = false;
       resetForm();
     }, 1500);
   } catch (err) {
-    error.value = 'Error al crear reserva';
+    notificationStore.error('Error al crear reserva');
     console.error(err);
   } finally {
     saving.value = false;
@@ -117,25 +115,7 @@ defineExpose({
       </v-card-title>
       
       <v-card-text class="mt-4">
-        <v-alert
-          v-if="error"
-          type="error"
-          variant="tonal"
-          closable
-          class="mb-4"
-        >
-          {{ error }}
-        </v-alert>
-        
-        <v-alert
-          v-if="success"
-          type="success"
-          variant="tonal"
-          closable
-          class="mb-4"
-        >
-          {{ success }}
-        </v-alert>
+
         
         <v-form @submit.prevent="saveReservation">
           <v-row>

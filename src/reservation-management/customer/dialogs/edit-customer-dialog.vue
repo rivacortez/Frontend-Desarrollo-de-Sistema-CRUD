@@ -2,8 +2,10 @@
 import { ref } from 'vue';
 import { CustomerRepository } from '../../domain/repositories/CustomerRepository';
 import type { Customer } from '../../domain/interfaces/Customer';
+import { useNotificationStore } from '../../../stores/notification';
 
 const customerRepository = new CustomerRepository();
+const notificationStore = useNotificationStore();
 
 interface DialogProps {
   customerData?: Customer;
@@ -41,24 +43,20 @@ const resetForm = () => {
     address: ''
   };
   customerId.value = undefined;
-  error.value = '';
-  success.value = '';
 };
 
 const saveCustomer = async () => {
   if (saving.value) return;
 
-  error.value = '';
-  success.value = '';
   saving.value = true;
 
   try {
     if (customerId.value !== undefined) {
       await customerRepository.update(customerId.value, customer.value);
-      success.value = 'Comensal actualizado correctamente';
+      notificationStore.success('Comensal actualizado correctamente');
     } else {
       await customerRepository.create(customer.value);
-      success.value = 'Comensal creado correctamente';
+      notificationStore.success('Comensal creado correctamente');
     }
 
     setTimeout(() => {
@@ -67,9 +65,9 @@ const saveCustomer = async () => {
       emit('close');
     }, 1500);
   } catch (err) {
-    error.value = customerId.value !== undefined
+    notificationStore.error(customerId.value !== undefined
         ? 'Error al actualizar el comensal'
-        : 'Error al crear el comensal';
+        : 'Error al crear el comensal');
     console.error(err);
   } finally {
     saving.value = false;
@@ -103,25 +101,6 @@ defineExpose({
       </v-card-title>
 
       <v-card-text class="mt-4">
-        <v-alert
-          v-if="error"
-          type="error"
-          variant="tonal"
-          closable
-          class="mb-4"
-        >
-          {{ error }}
-        </v-alert>
-
-        <v-alert
-          v-if="success"
-          type="success"
-          variant="tonal"
-          closable
-          class="mb-4"
-        >
-          {{ success }}
-        </v-alert>
 
         <v-form @submit.prevent="saveCustomer">
           <v-row>

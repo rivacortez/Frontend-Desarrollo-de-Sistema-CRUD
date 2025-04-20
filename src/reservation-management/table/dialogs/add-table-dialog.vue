@@ -2,9 +2,11 @@
 import { ref } from 'vue';
 import { TableRepository } from '../../domain/repositories/TableRepository';
 import type { Table } from '../../domain/interfaces/Table';
+import { useNotificationStore } from '../../../stores/notification';
 
 const emit = defineEmits(['table-created']);
 const repository = new TableRepository();
+const notificationStore = useNotificationStore();
 
 const showDialog = ref(false);
 const table = ref<Table>({
@@ -13,8 +15,6 @@ const table = ref<Table>({
   location: ''
 });
 const saving = ref(false);
-const error = ref('');
-const success = ref('');
 
 const numberRules = [
   (v: string) => !!v || 'Número de mesa requerido',
@@ -32,27 +32,23 @@ const resetForm = () => {
     capacity: 0,
     location: ''
   };
-  error.value = '';
-  success.value = '';
 };
 
 const saveTable = async () => {
   if (saving.value) return;
 
-  error.value = '';
-  success.value = '';
   saving.value = true;
 
   try {
     await repository.create(table.value);
-    success.value = 'Mesa creada';
+    notificationStore.success('Mesa creada');
     emit('table-created');
     setTimeout(() => {
       showDialog.value = false;
       resetForm();
     }, 1000);
   } catch (err) {
-    error.value = 'Error al crear mesa';
+    notificationStore.error('Error al crear mesa');
     console.error(err);
   } finally {
     saving.value = false;
@@ -72,6 +68,7 @@ const openDialog = () => {
 defineExpose({
   openDialog
 });
+
 </script>
 
 <template>
@@ -86,25 +83,6 @@ defineExpose({
       </v-card-title>
 
       <v-card-text class="mt-4">
-        <v-alert
-            v-if="error"
-            type="error"
-            variant="tonal"
-            closable
-            class="mb-4"
-        >
-          {{ error }}
-        </v-alert>
-
-        <v-alert
-            v-if="success"
-            type="success"
-            variant="tonal"
-            closable
-            class="mb-4"
-        >
-          {{ success }}
-        </v-alert>
 
         <v-form @submit.prevent="saveTable">
           <v-row>

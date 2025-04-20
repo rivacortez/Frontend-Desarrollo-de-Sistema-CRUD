@@ -2,9 +2,11 @@
 import { ref } from 'vue';
 import { CustomerRepository } from '../../domain/repositories/CustomerRepository';
 import type { Customer } from '../../domain/interfaces/Customer';
+import { useNotificationStore } from '../../../stores/notification';
 
 const customerRepository = new CustomerRepository();
 const emit = defineEmits(['customer-created']);
+const notificationStore = useNotificationStore();
 
 const showDialog = ref(false);
 const customer = ref<Customer>({
@@ -14,8 +16,6 @@ const customer = ref<Customer>({
   address: ''
 });
 const saving = ref(false);
-const error = ref('');
-const success = ref('');
 
 const nameRules = [
   (v: string) => !!v || 'El nombre es obligatorio',
@@ -33,27 +33,23 @@ const resetForm = () => {
     phone: '',
     address: ''
   };
-  error.value = '';
-  success.value = '';
 };
 
 const saveCustomer = async () => {
   if (saving.value) return;
 
-  error.value = '';
-  success.value = '';
   saving.value = true;
 
   try {
     const createdCustomer = await customerRepository.create(customer.value);
-    success.value = 'Comensal creado correctamente';
+    notificationStore.success('Comensal creado correctamente');
     emit('customer-created', createdCustomer);
     setTimeout(() => {
       showDialog.value = false;
       resetForm();
     }, 1500);
   } catch (err) {
-    error.value = 'Error al crear el comensal';
+    notificationStore.error('Error al crear el comensal');
     console.error(err);
   } finally {
     saving.value = false;
@@ -82,26 +78,7 @@ defineExpose({
       </v-card-title>
       
       <v-card-text class="mt-4">
-        <v-alert
-          v-if="error"
-          type="error"
-          variant="tonal"
-          closable
-          class="mb-4"
-        >
-          {{ error }}
-        </v-alert>
-        
-        <v-alert
-          v-if="success"
-          type="success"
-          variant="tonal"
-          closable
-          class="mb-4"
-        >
-          {{ success }}
-        </v-alert>
-        
+
         <v-form @submit.prevent="saveCustomer">
           <v-row>
             <v-col cols="12">

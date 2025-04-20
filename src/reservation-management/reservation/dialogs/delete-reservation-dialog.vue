@@ -2,6 +2,7 @@
 import { ref, watch } from 'vue';
 import { ReservationRepository } from '../../domain/repositories/ReservationRepository';
 import type { Reservation } from '../../domain/interfaces/Reservation';
+import { useNotificationStore } from '../../../stores/notification';
 
 const props = defineProps({
   modelValue: Boolean,
@@ -20,14 +21,11 @@ const props = defineProps({
 
 const emit = defineEmits(['update:modelValue', 'reservation-deleted']);
 const repository = new ReservationRepository();
+const notificationStore = useNotificationStore();
 
 const loading = ref(false);
-const error = ref('');
-const success = ref('');
 
 const resetState = () => {
-  error.value = '';
-  success.value = '';
   loading.value = false;
 };
 
@@ -35,20 +33,20 @@ const handleConfirm = async () => {
   if (loading.value) return;
   loading.value = true;
   if (props.reservation.id === undefined) {
-    error.value = 'Error: ID de reserva no válido';
+    notificationStore.error('Error: ID de reserva no válido');
     loading.value = false;
     return;
   }
 
   try {
     await repository.delete(props.reservation.id);
-    success.value = 'Reserva eliminada';
+    notificationStore.success('Reserva eliminada');
     setTimeout(() => {
       emit('reservation-deleted');
       emit('update:modelValue', false);
-    }, 1000);
+    }, 1500);
   } catch (err) {
-    error.value = 'Error al eliminar reserva';
+    notificationStore.error('Error al eliminar reserva');
     console.error(err);
   } finally {
     loading.value = false;
@@ -73,26 +71,6 @@ watch(() => props.modelValue, (newVal) => {
       </v-card-title>
       
       <v-card-text class="mt-4">
-        <v-alert
-          v-if="error"
-          type="error"
-          variant="tonal"
-          closable
-          class="mb-4"
-        >
-          {{ error }}
-        </v-alert>
-        
-        <v-alert
-          v-if="success"
-          type="success"
-          variant="tonal"
-          closable
-          class="mb-4"
-        >
-          {{ success }}
-        </v-alert>
-
         <p class="text-body-1" v-if="reservation && reservation.customer">
           ¿Está seguro de eliminar la reserva para
           <strong>{{ reservation.customer.name }}</strong>

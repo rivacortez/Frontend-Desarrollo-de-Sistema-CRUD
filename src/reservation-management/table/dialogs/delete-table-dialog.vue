@@ -2,6 +2,7 @@
 import { ref, watch } from 'vue';
 import { TableRepository } from '../../domain/repositories/TableRepository';
 import type { Table } from '../../domain/interfaces/Table';
+import { useNotificationStore } from '../../../stores/notification';
 
 const props = defineProps({
   modelValue: Boolean,
@@ -13,14 +14,11 @@ const props = defineProps({
 
 const emit = defineEmits(['update:modelValue', 'table-deleted']);
 const repository = new TableRepository();
+const notificationStore = useNotificationStore();
 
 const loading = ref(false);
-const error = ref('');
-const success = ref('');
 
 const resetState = () => {
-  error.value = '';
-  success.value = '';
   loading.value = false;
 };
 
@@ -29,20 +27,20 @@ const handleConfirm = async () => {
   loading.value = true;
 
   if (props.table.id === undefined) {
-    error.value = 'Error: ID de mesa no válido';
+    notificationStore.error('Error: ID de mesa no válido');
     loading.value = false;
     return;
   }
 
   try {
     await repository.delete(props.table.id);
-    success.value = 'Mesa eliminada';
+    notificationStore.success('Mesa eliminada');
     setTimeout(() => {
       emit('table-deleted');
       emit('update:modelValue', false);
     }, 1000);
   } catch (err) {
-    error.value = 'Error al eliminar mesa';
+    notificationStore.error('Error al eliminar mesa');
     console.error(err);
   } finally {
     loading.value = false;
@@ -67,25 +65,7 @@ watch(() => props.modelValue, (newVal) => {
       </v-card-title>
       
       <v-card-text class="mt-4">
-        <v-alert
-          v-if="error"
-          type="error"
-          variant="tonal"
-          closable
-          class="mb-4"
-        >
-          {{ error }}
-        </v-alert>
-        
-        <v-alert
-          v-if="success"
-          type="success"
-          variant="tonal"
-          closable
-          class="mb-4"
-        >
-          {{ success }}
-        </v-alert>
+        <!-- Alertas manejadas por NotificationSystem -->
         
         <p class="text-body-1">
           ¿Está seguro de eliminar la mesa 
