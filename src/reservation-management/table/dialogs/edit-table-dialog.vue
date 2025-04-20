@@ -26,8 +26,6 @@ const table = ref<Table>({
 });
 const loading = ref(false);
 const saving = ref(false);
-const error = ref('');
-const success = ref('');
 
 const numberRules = [
   (v: string) => !!v || 'Número de mesa requerido',

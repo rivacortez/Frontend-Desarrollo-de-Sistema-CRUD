@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue';
-import { useRouter, useRoute } from 'vue-router';
+import {  useRoute } from 'vue-router';
 import { useTheme, useDisplay } from 'vuetify';
 import NotificationSystem from './components/NotificationSystem.vue';
 
