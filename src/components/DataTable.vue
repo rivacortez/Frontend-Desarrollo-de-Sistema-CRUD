@@ -208,7 +208,7 @@ watch(filteredItems, () => {
   width: 100%;
   border-radius: 8px;
   overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 8px rgba(var(--v-theme-on-surface), 0.1);
 }
 
 .data-table-header {
@@ -216,7 +216,7 @@ watch(filteredItems, () => {
   justify-content: space-between;
   align-items: center;
   padding: 16px;
-  background-color: #f5f5f5;
+  background-color: rgb(var(--v-theme-surface));
 }
 
 .search-container {
@@ -240,11 +240,11 @@ watch(filteredItems, () => {
 }
 
 .sortable:hover {
-  background-color: rgba(0, 0, 0, 0.04);
+  background-color: rgba(var(--v-theme-on-surface), 0.04);
 }
 
 .sorted {
-  background-color: rgba(0, 0, 0, 0.02);
+  background-color: rgba(var(--v-theme-on-surface), 0.02);
 }
 
 .actions-column {
@@ -256,6 +256,21 @@ watch(filteredItems, () => {
   display: flex;
   justify-content: center;
   padding: 16px;
-  background-color: #f5f5f5;
+  background-color: rgb(var(--v-theme-surface));
+}
+
+:deep(.v-table) {
+  background-color: rgb(var(--v-theme-surface)) !important;
+  color: rgb(var(--v-theme-on-surface)) !important;
+  border-color: rgba(var(--v-theme-on-surface), 0.12) !important;
+}
+
+:deep(.v-table th) {
+  background-color: rgb(var(--v-theme-surface)) !important;
+  color: rgb(var(--v-theme-on-surface)) !important;
+}
+
+:deep(.v-table tr:hover) {
+  background-color: rgba(var(--v-theme-on-surface), 0.04) !important;
 }
 </style>

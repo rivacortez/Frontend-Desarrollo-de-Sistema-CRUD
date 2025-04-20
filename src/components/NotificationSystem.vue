@@ -44,6 +44,7 @@ const positionStyle = computed(() => ({
       </v-alert>
     </v-slide-y-transition>
   </div>
+  
 </template>
 
 <style scoped>
