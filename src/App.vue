@@ -15,11 +15,9 @@ const toggleTheme = () => {
   theme.global.name.value = isDark.value ? 'dark' : 'light';
 };
 
-// Drawer & rail
 const drawer = ref(true);
 const rail = ref(false);
 
-// En móvil arrancamos cerrado
 onMounted(() => {
   if (!mdAndUp.value) drawer.value = false;
 });
@@ -27,7 +25,6 @@ watch(mdAndUp, val => {
   drawer.value = val;
 });
 
-// Datos estáticos
 const appTitle   = 'mesa 24/7';
 const appLogoUrl = 'https://media.licdn.com/dms/image/v2/D4E0BAQFcuCSfL5AkqA/company-logo_200_200/company-logo_200_200/0/1700057274994/mesa_24_7_logo?e=1750291200&v=beta&t=FR4tOob3yCmeW0CBez-0ZPzYJbQ_je6Nbg-Ls3LY2GI';
 const user       = { avatar: 'https://media.licdn.com/dms/image/v2/D4E03AQFADns6Xy45Og/profile-displayphoto-shrink_200_200/B4EZOBJ1S8HwAY-/0/1733038659527?e=2147483647&v=beta&t=3mjkf5XIOQQ47mW3WwEd3iELk6FZ1yfk5gnOLoMB_2o' };
@@ -39,7 +36,6 @@ const menuItems = [
   { title: 'Mesas',       icon: 'mdi-table-chair',    path: '/tables', color: 'info' }
 ];
 
-// Título de la ruta activa
 const currentPageTitle = computed(() => {
   const active = menuItems.find(i => route.path.startsWith(i.path));
   return active?.title || '';

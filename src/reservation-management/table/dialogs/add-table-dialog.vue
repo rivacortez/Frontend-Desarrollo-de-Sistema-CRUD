@@ -1,13 +1,9 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue';
+import { ref } from 'vue';
 import { TableRepository } from '../../domain/repositories/TableRepository';
 import type { Table } from '../../domain/interfaces/Table';
 
-const props = defineProps({
-  modelValue: Boolean
-});
-
-const emit = defineEmits(['update:modelValue', 'table-created']);
+const emit = defineEmits(['table-created']);
 const repository = new TableRepository();
 
 const showDialog = ref(false);
@@ -52,7 +48,7 @@ const saveTable = async () => {
     success.value = 'Mesa creada';
     emit('table-created');
     setTimeout(() => {
-      emit('update:modelValue', false);
+      showDialog.value = false;
       resetForm();
     }, 1000);
   } catch (err) {
@@ -64,22 +60,14 @@ const saveTable = async () => {
 };
 
 const closeDialog = () => {
-  emit('update:modelValue', false);
+  showDialog.value = false;
+  resetForm();
 };
 
 const openDialog = () => {
   resetForm();
   showDialog.value = true;
 };
-
-watch(() => props.modelValue, (newVal) => {
-  showDialog.value = newVal;
-  if (newVal) resetForm();
-});
-
-watch(showDialog, (newVal) => {
-  emit('update:modelValue', newVal);
-});
 
 defineExpose({
   openDialog
